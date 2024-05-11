@@ -29,17 +29,17 @@ axios(" https://api.thecatapi.com/v1/images/search")
 async function initialLoad () {
     try{
         const response = await axios("https://api.thecatapi.com/v1/breeds");
-        const breeds = response.data;
+        const breeds = await response.data;
 
         breeds.forEach(breed => {
             const option = document.createElement("option")
             option.value = breed.id;
             option.textContent = breed.name;
-      breedSelect.appendChild(option);
-        });
-        breedSelect.addEventListener("change", handleBreedSelectChange);
-        handleBreedSelectChange();
 
+            breedSelect.appendChild(option);
+        });
+        // breedSelect.addEventListener("change", handleBreedSelectChange);
+        // handleBreedSelectChange();
     }catch (error) {
         console.error("Error loading breeds:", error);
       }
@@ -55,7 +55,7 @@ async function handleBreedSelectChange() {
       const breedId = breedSelect.value;
   
       // Fetch information about the selected breed
-      const response = await axios.get(`https://api.thecatapi.com/v1/images/search?breed_ids=${breedId}&limit=5`);
+      const response = await axios(`https://api.thecatapi.com/v1/images/search?breed_ids=${breedId}&limit=10`);
   
       // Extract data from the response
       const images = response.data;
@@ -93,6 +93,44 @@ async function handleBreedSelectChange() {
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
+breedSelect.addEventListener("change", loadCarousel);
+async function loadCarousel() {
+  const val = breedSelect.value;
+  const url = `/images/search?limit=25&breed_ids=${val}`;
+
+  const res = await axios(url, {
+    onDownloadProgress: updateProgress
+  });
+
+  buildCarousel(res.data);
+}
+
+function buildCarousel(data, favourites) {
+  Carousel.clear();
+  infoDump.innerHTML = "";
+
+  data.forEach((ele) => {
+    const item = Carousel.createCarouselItem(
+      ele.url,
+      breedSelect.value,
+      ele.id
+    );
+    Carousel.appendCarousel(item);
+  });
+
+  if (favourites) {
+    infoDump.innerHTML = "Here are your saved favourites!";
+  } else if (data[0]) {
+    const info = data[0].breeds || null;
+    if (info && info[0].description) infoDump.innerHTML = info[0].description;
+  } else {
+    infoDump.innerHTML =
+      "<div class='text-center'>No information on this breed, sorry!</div>";
+  }
+
+  Carousel.start();
+}
+
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
