@@ -29,9 +29,9 @@ export function start() {
     "#carouselExampleControls"
   );
   if (window.matchMedia("(min-width: 768px)").matches) {
-    const carousel = new bootstrap.Carousel(multipleCardCarousel, {
-      interval: false,
-    });
+    // const carousel = new bootstrap.Carousel(multipleCardCarousel, {
+    //   interval: false,
+    // });
     const carouselWidth = $(".carousel-inner")[0].scrollWidth;
     const cardWidth = $(".carousel-item").width();
     let scrollPosition = 0;

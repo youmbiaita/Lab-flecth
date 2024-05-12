@@ -1,4 +1,6 @@
 import * as Carousel from "./Carousel.mjs";
+// import jsdom from "jsdom";
+// jsdom.fromFile("./index.html");
 // import axios from "axios";
 // The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
@@ -96,11 +98,8 @@ async function handleBreedSelectChange() {
 breedSelect.addEventListener("change", loadCarousel);
 async function loadCarousel() {
   const val = breedSelect.value;
-  const url = `/images/search?limit=25&breed_ids=${val}`;
-
-  const res = await axios(url, {
-    onDownloadProgress: updateProgress
-  });
+  
+  const res = await axios(`https://api.thecatapi.com/v1/images/search?limit=25&breed_ids=${val}`);
 
   buildCarousel(res.data);
 }
